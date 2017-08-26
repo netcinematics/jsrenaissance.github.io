@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>CyberWorld1</title>
+
+    <link rel="stylesheet" href="../lib/font-awesome/font-awesome-4.7.0/css/font-awesome.min.css">
+
+    <script src="http://www.babylonjs.com/hand.minified-1.2.js"></script>
+<!--     <script src="http://www.babylonjs.com/cannon.js"></script>
+    <script src="http://www.babylonjs.com/oimo.js"></script>  -->
+   <!-- <script src="http://cdn.babylonjs.com/2-4/babylon.js"></script>  arrow key bug fix -->
+    <!-- <script src="../lib/babylon/babylon_v3.0_alpha.js"></script> --> <!-- arrow key bug -->
+    <script src="../lib/babylon/babylon_2-4_min.js"></script> <!-- arrow key bug fix -->
+    <!-- todo fix for arrowkey bug --> 
+    <!-- https://cdnjs.cloudflare.com/ajax/libs/babylonjs/2.5.0/babylon.max.js -->
+    <!-- <script src="../lib/babylon/babylon.custom_v2.5_light.js"></script> -->  <!-- todo arrowkey bug -->
+    <!-- <script src="../lib/babylon/babylon.custom.v2.5_nophysics.js"></script> -->  <!-- todo arrowkey bug -->
+    <!-- <script src="../lib/babylon/babylon.custom_v2.5_max.js"></script> -->  <!-- todo arrowkey bug -->
+    <!-- <script src="../lib/babylon/6-2/babylon.max.js"></script> --> <!-- todo arrowkey bug -->
+    <script src="../3d/scapes/WaterMaterial/babylon.waterMaterial.js"></script>
+    <script src="../3d/scapes/WaterMaterial/water.js"></script>
+
+    <!--UI-THIRD-PARTY-->
+    <!-- <script src="../lib/d3/d3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TimelineMax.min.js"></script> -->
+
+    <!--TWEENJS-->
+    <script src="../lib/tweenjs/stats.min.js"></script>
+    <script src="../lib/tweenjs/Tween.js"></script>
+    <script src="../lib/tweenjs/RequestAnimationFrame.js"></script>
+  
+    <style>
+        html, body {
+            overflow: hidden;
+            width   : 100%;
+            height  : 100%;
+            margin  : 0;
+            padding : 0;
+        }
+        #renderCanvas {
+            width   : 100%;
+            height  : 100%;
+            touch-action: none;
+        }
+    </style>
+    <style>
+      * {
+          cursor: default;
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -khtml-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+      }
+    </style>
+
+  <script>
+    //MOBILE: Is device touchy?
+    var touchcapable = 'ontouchstart' in window ||
+     window.DocumentTouch && document instanceof window.DocumentTouch ||
+     navigator.maxTouchPoints > 0 ||
+     window.navigator.msMaxTouchPoints > 0;
+
+     if(touchcapable) console.log('touch capable');
+     if(!touchcapable) console.log('not touch capable');
+   </script>
+
+
+    <script>
+      //MOBILE: hide address bar on mobile. experimental. Works sometimes?
+      window.addEventListener("load",function() {
+        setTimeout(function(){
+          window.scrollTo(0, 1);
+        }, 0);
+      });
+    </script>
+
+</head>
+<body>
+    <!--BABYLON-BOILERPLATE-->
+    <canvas id="renderCanvas">Upgrade Browser for canvas support.</canvas>
+    <script src="./scene.js"></script>
+    <!--END-BOILERPLATE-->
+    <!--BEGIN-UI-COMPONENTS--> 
+    <!-- ************************************FPS-STATS*************************************-->
+    <div id='fpsstats' style='z-index:101;position:fixed;top:5px;right:5px;'></div>
+    <!-- ************************************FPS-STATS*************************************-->
+
+    <!-- ************************************2D-UI************************************* 2D overlay over 3D world -->
+    <style>
+    #starbar{
+        position:fixed;
+        left:5px;
+        top:5px;
+        z-index:100;
+        height:20px;
+        border-radius: 20px;
+        background-color: steelblue;
+        padding:6px;
+        border: 1px solid #444;
+        display:inline-block;
+        text-align:center;
+        white-space: nowrap;
+      }
+    .icostar, .icotrophy{
+        float:left;
+        width:30px;
+      }
+    #starcount{
+      float:left;
+      font-style:impact;
+    }
+    #starDivider{
+        float:left;
+        margin-left:10px;
+      }
+    </style>
+
+
+      <div id="starbar">
+        <!-- <div class='growbar'><i id="btnWinnings" title="winnings" class="fa fa-trophy" style='color:#cece00;'></i> </div> -->
+        <!-- <div class='icotrophy'><i id="icotrophy" title="you win" class="fa fa-trophy" style='color:#444;'></i> </div> -->
+        <div class='icotrophy'><i id="icotrophy" title="stars" class="fa fa-star" style='color:#444;'></i> </div>
+        <div id="starcount">0</div>
+        <span id="starDivider">|</span>
+        <div class='icostar' id="icostarz1"><i title="stars" class="fa fa-star"></i></div> 
+        <div class='icostar' id="icostarz2"><i title="stars" class="fa fa-star"></i></div>
+        <div class='icostar' id="icostarz3"><i title="stars" class="fa fa-star"></i></div>
+        <div class='icostar' id="icostarz4"><i title="stars" class="fa fa-star"></i></div>
+        <div class='icostar' id="icostarz5"><i title="stars" class="fa fa-star"></i></div>
+        <div class='icostar' id="icostarz6"><i title="stars" class="fa fa-star"></i></div>
+        <div class='icostar' id="icostarz7"><i title="stars" class="fa fa-star"></i></div>
+        <div class='icostar' id="icostarz8"><i title="stars" class="fa fa-star"></i></div>
+        <div class='icostar' id="icostarz9"><i title="stars" class="fa fa-star"></i></div>
+        <div class='icostar' id="icostarz10"><i title="stars" class="fa fa-star"></i></div>
+      </div> 
+
+    <script>
+      var position;
+      var target;
+      // var tween, tweenBack;
+      var icostarz = [];
+      var starCount = 0;
+      var visCount = 10;
+      var starBarExpand, starBarCollapse;
+
+      init();
+      animate();
+
+      function init() {
+        position = {/*x: 100, y: 100, rotation: 0,*/ width:60};
+        target = document.getElementById('starbar');
+        countDiv = document.getElementById('starcount');
+        icostarz = document.getElementsByClassName('icostar');
+        // target = document.getElementById('target');
+        starBarExpand = new TWEEN.Tween(position)
+          // .to({x: 700, y: 200, rotation: 359}, 2000)
+          .to({width:'400px'}, 2000)
+          .delay(1000)
+          .easing(TWEEN.Easing.Cubic.In)
+          .onUpdate(function(){
+            target.style.width = position.width+'px';
+            //show stars at position.
+            if(visCount<1&&parseInt(position.width)>=100){icostarz[0].children[0].style.opacity=1; icostarz[0].children[0].style.color='#000'; visCount++;}
+            if(visCount<2&&parseInt(position.width)>=130){icostarz[1].children[0].style.opacity=1; icostarz[1].children[0].style.color='#000'; visCount++;}
+            if(visCount<3&&parseInt(position.width)>=160){icostarz[2].children[0].style.opacity=1; icostarz[2].children[0].style.color='#000'; visCount++;}
+            if(visCount<4&&parseInt(position.width)>=190){icostarz[3].children[0].style.opacity=1; icostarz[3].children[0].style.color='#000'; visCount++;}
+            if(visCount<5&&parseInt(position.width)>=220){icostarz[4].children[0].style.opacity=1; icostarz[4].children[0].style.color='#000'; visCount++;}
+            if(visCount<6&&parseInt(position.width)>=250){icostarz[5].children[0].style.opacity=1; icostarz[5].children[0].style.color='#000'; visCount++;}
+            if(visCount<7&&parseInt(position.width)>=280){icostarz[6].children[0].style.opacity=1; icostarz[6].children[0].style.color='#000'; visCount++;}
+            if(visCount<8&&parseInt(position.width)>=310){icostarz[7].children[0].style.opacity=1; icostarz[7].children[0].style.color='#000'; visCount++;}
+            if(visCount<9&&parseInt(position.width)>=340){icostarz[8].children[0].style.opacity=1; icostarz[8].children[0].style.color='#000'; visCount++;}
+            if(visCount<10&&parseInt(position.width)>=365){icostarz[9].children[0].style.opacity=1; icostarz[9].children[0].style.color='#000'; visCount++;}
+
+          })
+          .onComplete(function(){
+          });
+
+        starBarCollapse = new TWEEN.Tween(position)
+          .to({width:'75px'}, 3000)
+          .easing(TWEEN.Easing.Cubic.In)
+          .onUpdate(function(){
+            target.style.width = position.width+'px';
+            //hide stars at position
+            if(visCount===1&&parseInt(position.width)<=100){icostarz[0].children[0].style.opacity=0; visCount--;}
+            if(visCount===2&&parseInt(position.width)<=130){icostarz[1].children[0].style.opacity=0; visCount--;}
+            if(visCount===3&&parseInt(position.width)<=160){icostarz[2].children[0].style.opacity=0; visCount--;}
+            if(visCount===4&&parseInt(position.width)<=190){icostarz[3].children[0].style.opacity=0; visCount--;}
+            if(visCount===5&&parseInt(position.width)<=220){icostarz[4].children[0].style.opacity=0; visCount--;}
+            if(visCount===6&&parseInt(position.width)<=250){icostarz[5].children[0].style.opacity=0; visCount--;}
+            if(visCount===7&&parseInt(position.width)<=280){icostarz[6].children[0].style.opacity=0; visCount--;}
+            if(visCount===8&&parseInt(position.width)<=310){icostarz[7].children[0].style.opacity=0; visCount--;}
+            if(visCount===9&&parseInt(position.width)<=340){icostarz[8].children[0].style.opacity=0; visCount--;}
+            if(visCount===10&&parseInt(position.width)<=370){icostarz[9].children[0].style.opacity=0; visCount--;}
+
+          })
+          .onComplete(function() {
+            });
+
+        starBarCollapse.chain(starBarExpand);
+
+        starBarExpand.start(); 
+
+      }
+      function animate( time ) {
+        requestAnimationFrame( animate );
+        TWEEN.update( time );
+      }
+
+    </script>
+    <!-- ************************************END-2D-UI*************************************-->
+
+    <!-- ************************************BIG-TOUCHY-BUTTONS*************************************-->
+    <style>
+
+/********************************Media-Query-TEMPLATES*********************************************/
+/*@media (min-width:320px)  {  smartphones, portrait iPhone, portrait 480x320 phones (Android)  }*/
+/*@media (min-width:480px)  {  smartphones, Android phones, landscape iPhone  }*/
+/*@media (min-width:600px)  {  portrait tablets, portrait iPad, e-readers (Nook/Kindle), landscape 800x480 phones (Android)  }*/
+/*@media (min-width:801px)  {  tablet, landscape iPad, lo-res laptops ands desktops  }*/
+/*@media (min-width:1025px) {  big landscape tablets, laptops, and desktops  }*/
+/*@media (min-width:1281px) {  hi-res laptops and desktops  }*/
+
+
+/*@media (max-width:1000px)  {  */
+  /*tablet, landscape iPad, lo-res laptops ands desktops */
+        a.btn1{
+          left: 3px;
+          top: 43%;
+        }
+        a.btn2{
+          right:3px;
+          top: 43%;
+        }
+        a.btn3{
+          padding-top:3px;
+          left: 3px;
+          top: 53%;
+        }
+        a.btn4{
+          padding-top:3px;
+          right: 3px;
+          top: 53%;
+        }
+        a.btn5{
+          left: 3px;
+          top: 63%;
+        }
+        a.btn6{
+          right: 3px;
+          top: 63%;
+        }
+
+        a.btn {
+          position: fixed;
+          z-index:101; 
+          border-radius: 50%;
+          color: #444;
+          font-size: 32px;
+          width: 50px;
+          height: 50px;
+          padding-top:9px;
+          background: #7facd6; /*#2198ff;*/
+          border: 4px solid #748696;
+          text-align: center;
+          text-shadow: 0 1px 0 rgba(255,255,255,.8);
+        }
+
+        a.btn:hover {
+          background: steelblue; /*#007fed;*/
+          border: 6px solid #444;
+        }
+        a.btn:active {
+        }
+    /*end tablet media query*/
+
+  /*@media (min-width:1600px) {*/
+  @media only screen and (min-device-width: 320px) and (max-device-width: 668px) {
+        a.btn {
+          width: 100px;
+          height: 100px;
+        }
+        a.btn i{
+          margin-top:25px;
+        }
+    }
+
+    /*big landscape tablets, laptops, and desktops  */
+    @media (min-width:1800px) {  
+      a.btn1 { display:none; }
+      a.btn2 { display:none; }
+      a.btn3 { display:none; }
+      a.btn4 { display:none; }
+      a.btn5 { display:none; }
+      a.btn6 { display:none; }
+
+        a.btn {
+          width: 50px;
+          height: 50px;
+        }
+    }
+
+
+
+    </style>
+    <a class='btn btn2' id='btn2'><i title="look right" class="fa fa-mail-reply"></i></a> -->
+    <a class='btn btn1' id='btn1'><i title="look left" class="fa fa-angle-right"></i></a>
+    <a class='btn btn2' id='btn2'><i title="look right" class="fa fa-angle-left"></i></a>
+    <a class='btn btn3' id='btn3'><i title="look left" class="fa fa-angle-double-right"></i></a>
+    <a class='btn btn4' id='btn4'><i title="look right" class="fa fa-angle-double-left"></i></a>
+    <a class='btn btn5' id='btn5'><i title="explore" class="fa fa-angle-double-up"></i></a>
+    <a class='btn btn6' id='btn6'><i title="wait, go back" class="fa fa-angle-double-down"></i></a>
+    <!-- ************************************END-BIG-TOUCHY-BUTTONS*************************************-->
+    <!-- ************************************STATIC-ICON-BAR*************************************-->
+    <style>
+      .iconbar{
+        position:absolute;
+        bottom:44px;
+        z-index:100;
+        width:80%;
+        height:20px;
+        border-radius: 20px;
+        background-color: steelblue;
+        padding:4px;
+        border: 1px solid #444;
+        margin-left:10%;
+        margin-right:10%;
+      }
+      .iconbar .fa {
+        font-size:14px;
+        color:#000;
+        margin-left:4%;
+        cursor:pointer;
+        margin-bottom:20px;
+      }
+      .menuDivider{
+        margin-left:4%;
+      }
+      #infoMessage{
+        margin-left:4%;
+      }
+      .btnDisabled{
+        color:#444 !important; 
+        cursor:no-drop !important;
+      }
+    </style>
+    <div class="iconbar">
+        <i id="btnExplore" title="explore" class="fa fa-mail-forward"></i>
+        <i id="btnHyperLoc" title="hyperlocate" class="fa fa-crosshairs"></i>
+        <i id="btnCapture" title="capture" class="fa fa-camera"></i>
+        <i id="btnCollections" title="collections" class="fa fa-cubes"></i>
+        <i id="btnPath" title="save path" class="fa fa-ellipsis-h"></i> 
+        <i id="btnExploreBack" title="wait, go back" class="fa fa-mail-reply"></i>
+        <span class="menuDivider">|</span>
+        <i id="btnA" title="powers" class="fa fa-diamond"></i>
+        <i id="btnB" title="x" class="fa fa-bolt"></i>
+        <i id="btnC" title="y" class="fa fa-clock-o"></i>
+        <i id="btn" title="build" class="fa fa-wrench btnDisabled"></i> 
+        <i id="btn" title="full screen" class="fa fa-expand btnDisabled"></i> 
+        <i id="btn" title="zyberspace" class="fa fa-snowflake-o btnDisabled"></i>
+        <i id="btn" title="music" class="fa fa-headphones btnDisabled"></i> 
+        <i id="btn" title="profile" class="fa fa-user-o btnDisabled"></i> 
+        <i id="btn" title="escaptonaughts" class="fa fa-users btnDisabled"></i> 
+        <i id="btn" title="credits" class="fa fa-certificate btnDisabled"></i> 
+        <i id="btnCollectionz" title="collection" class="fa fa-cube"></i>
+        <i id="btn" title="send code" class="fa fa-cogs btnDisabled"></i>
+        <i id="btn" title="bug" class="fa fa-bug btnDisabled"></i>
+        <i id="btn" title="bug" class="fa fa-copyright btnDisabled"></i>
+        <i id="btn" title="bug" class="fa fa-compass btnDisabled"></i>
+        <i id="btn" title="bug" class="fa fa-commenting btnDisabled"></i>
+        <i id="btn" title="bug" class="fa fa-gift btnDisabled"></i>
+        <span id="infoMessage">Welcome ... MIT NetCinematics LLC.</span> 
+
+    </div> 
+    <!-- ************************************END-STATIC-ICON-BAR*************************************-->
+    <!--*******************************anyscape-IMPLEMENTATION**************************************-->
+    <script>
+        var anyscape;
+        //INIT**********************************************************************************
+        window.addEventListener('DOMContentLoaded', function(e){
+            anyscape = initAnyscape();
+        });
+
+
+        //*******************************UI-INTERACTION-HANDLERS***********************************
+        if(touchcapable){
+          var btn1 = document.getElementById('btn1');
+          var btn2 = document.getElementById('btn2');
+          var btn3 = document.getElementById('btn3');
+          var btn4 = document.getElementById('btn4');
+          var btn5 = document.getElementById('btn5');
+          var btn6 = document.getElementById('btn6');
+
+          btn1.addEventListener("touchstart", function(e){
+            e.preventDefault(); //avoid click fire.
+              anyscape.surfKeyDown('touchLeft') 
+          }, false);
+          btn1.addEventListener("touchend", function(e){
+            e.preventDefault(); //avoid click fire.
+              anyscape.surfKeyUp('touchLeft') 
+          }, false);
+          btn2.addEventListener("touchstart", function(e){
+            e.preventDefault(); //avoid click fire.
+              anyscape.surfKeyDown('touchRight') 
+          }, false);
+          btn2.addEventListener("touchend", function(e){
+            e.preventDefault(); //avoid click fire.
+              anyscape.surfKeyUp('touchRight') 
+          }, false);
+          btn3.addEventListener("touchstart", function(e){
+            e.preventDefault(); //avoid click fire.
+              anyscape.surfKeyDown('fastLeft') 
+          }, false);
+          btn3.addEventListener("touchend", function(e){
+            e.preventDefault(); //avoid click fire.
+              anyscape.surfKeyUp('fastLeft') 
+          }, false);
+          btn4.addEventListener("touchstart", function(e){
+            e.preventDefault(); //avoid click fire.
+              anyscape.surfKeyDown('fastRight') 
+          }, false);
+          btn4.addEventListener("touchend", function(e){
+            e.preventDefault(); //avoid click fire.
+              anyscape.surfKeyUp('fastRight') 
+          }, false);
+          btn5.addEventListener("touchstart", function(e){
+            e.preventDefault(); //avoid click fire.
+              anyscape.surfKeyDown('touchFwd') 
+          }, false);
+          btn5.addEventListener("touchend", function(e){
+            e.preventDefault(); //avoid click fire.
+              anyscape.surfKeyUp('touchFwd') 
+          }, false);
+          btn6.addEventListener("touchstart", function(e){
+            e.preventDefault(); //avoid click fire.
+              anyscape.surfKeyDown('touchBwd') 
+          }, false);
+          btn6.addEventListener("touchend", function(e){
+            e.preventDefault(); //avoid click fire.
+              anyscape.surfKeyUp('touchBwd') 
+          }, false);
+        }
+
+        document.getElementById('btnA').onclick = function(e){ 
+          starBarCollapse.start();
+        };
+
+        document.getElementById('btnB').onclick = function(e){ 
+          starBarExpand.start();         
+        };
+        document.getElementById('btnC').onclick = function(e){ 
+
+        };
+    </script>
+    <!--*******************************END-Babylon-IMPLEMENTATION**************************************-->
+
+    <style>
+    #msgTxt{
+      z-index: 102;
+      position:fixed;
+      top:5%;
+      left:5%;
+      color:#fff;
+      background-color: steelblue;
+      border-radius: 50%;
+      border:1px #444 solid;
+      padding:2px 4px 2px 4px;
+    }
+    </style>
+
+    <!--**************************************GGLA-TEST**************************************-->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-91079342-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <!--**************************************GGLA-TEST**************************************-->
+</body>
+</html>
